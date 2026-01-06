@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="id">
+<!DOCTYPE html>
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -43,37 +44,44 @@
     }
   </style>
 </head>
-<body>  <div class="container">
+<body>
+
+  <div class="container">
     <h1>Ihrish Studio</h1>
-    <p>Prompt Generator untuk UMKM & Guru</p><label>Kategori</label>
-<select id="kategori">
-  <option>UMKM</option>
-  <option>Pendidikan</option>
-</select>
+    <p>Prompt Generator untuk UMKM & Guru</p>
 
-<label>Nama Usaha / Judul Materi</label>
-<input type="text" id="nama" placeholder="Contoh: Toko Barokah / Sistem Tata Surya">
+    <label>Kategori</label>
+    <select id="kategori">
+      <option>UMKM</option>
+      <option>Pendidikan</option>
+    </select>
 
-<label>Bidang / Mata Pelajaran</label>
-<input type="text" id="bidang" placeholder="Contoh: Makanan / IPA">
+    <label>Nama Usaha / Judul Materi</label>
+    <input type="text" id="nama" placeholder="Contoh: Toko Barokah / Sistem Tata Surya">
 
-<label>Tujuan Desain</label>
-<input type="text" id="tujuan" placeholder="Contoh: Promosi / Media belajar">
+    <label>Bidang / Mata Pelajaran</label>
+    <input type="text" id="bidang" placeholder="Contoh: Makanan / IPA">
 
-<label>Target Audiens</label>
-<input type="text" id="audiens" placeholder="Contoh: Pelanggan umum / Siswa kelas 4">
+    <label>Tujuan Desain</label>
+    <input type="text" id="tujuan" placeholder="Contoh: Promosi / Media belajar">
 
-<label>Gaya Desain</label>
-<input type="text" id="gaya" placeholder="Minimalis, islami, ceria">
+    <label>Target Audiens</label>
+    <input type="text" id="audiens" placeholder="Contoh: Pelanggan umum / Siswa kelas 4">
 
-<button onclick="generatePrompt()">Generate Prompt</button>
+    <label>Gaya Desain</label>
+    <input type="text" id="gaya" placeholder="Minimalis, islami, ceria">
 
-<label>Hasil Prompt</label>
-<textarea id="hasil" placeholder="Hasil prompt akan muncul di sini..."></textarea>
+    <button onclick="generatePrompt()">Generate Prompt</button>
 
-  </div>  <footer>
+    <label>Hasil Prompt</label>
+    <textarea id="hasil" placeholder="Hasil prompt akan muncul di sini..."></textarea>
+  </div>
+
+  <footer>
     © 2026 Ihrish Studio
-  </footer>  <script>
+  </footer>
+
+  <script>
     function generatePrompt() {
       const kategori = document.getElementById('kategori').value;
       const nama = document.getElementById('nama').value;
@@ -86,5 +94,7 @@
 
       document.getElementById('hasil').value = prompt;
     }
-  </script></body>
+  </script>
+
+</body>
 </html>
