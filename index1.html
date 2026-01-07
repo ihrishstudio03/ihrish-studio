@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teman Guru</title>
+
+<style>
+*{box-sizing:border-box;font-family:Inter,Segoe UI,Arial}
+body{
+  margin:0;
+  background:linear-gradient(180deg,#eef3ff,#ffffff);
+  color:#222;
+}
+header{
+  background:#1e88e5;
+  color:#fff;
+  padding:26px;
+  text-align:center;
+}
+header h1{margin:0;font-size:2rem;font-weight:800}
+header p{margin-top:6px;font-size:.95rem;opacity:.95}
+
+.container{max-width:900px;margin:26px auto;padding:16px}
+
+.card{
+  background:#fff;
+  border-radius:20px;
+  padding:24px;
+  box-shadow:0 12px 30px rgba(0,0,0,.1);
+  margin-bottom:22px;
+}
+
+label{font-weight:600;font-size:.9rem}
+input,select,textarea{
+  width:100%;
+  padding:12px;
+  margin-top:6px;
+  margin-bottom:14px;
+  border-radius:12px;
+  border:1px solid #ccc;
+  font-size:.9rem;
+}
+textarea{min-height:100px}
+
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.primary{
+  background:#1e88e5;
+  color:#fff;
+}
+.primary:hover{background:#1565c0}
+
+.copy{
+  background:#43a047;
+  color:#fff;
+  margin-top:10px;
+}
+
+.badge{
+  display:inline-block;
+  padding:6px 14px;
+  border-radius:20px;
+  background:#e3f2fd;
+  color:#1e88e5;
+  font-size:.75rem;
+  font-weight:700;
+}
+
+.notice{
+  background:#fff3cd;
+  border-radius:14px;
+  padding:14px;
+  font-size:.85rem;
+  margin-top:14px;
+}
+
+.whatsapp{
+  display:block;
+  margin-top:12px;
+  padding:14px;
+  text-align:center;
+  background:#25d366;
+  color:#fff;
+  font-weight:800;
+  border-radius:14px;
+  text-decoration:none;
+}
+
+footer{
+  text-align:center;
+  padding:20px;
+  font-size:.8rem;
+  color:#666;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Teman Guru</h1>
+  <p>Generator Prompt Media Pembelajaran • Versi Trial</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+  <span class="badge" id="status">Trial (10x)</span>
+
+  <label>Nama Guru</label>
+  <input id="guru" placeholder="Contoh: Ibu Siti, S.Pd">
+
+  <label>Jenjang</label>
+  <select id="jenjang" onchange="updateMapel()">
+    <option>PAUD</option>
+    <option>SD</option>
+    <option>SMP</option>
+    <option>SMA</option>
+  </select>
+
+  <label>Mata Pelajaran</label>
+  <select id="mapel"></select>
+
+  <label>Jenis Media</label>
+  <select id="jenis" onchange="toggleKelas()">
+    <option>LKPD</option>
+    <option>Infografis</option>
+    <option>Poster Edukasi</option>
+  </select>
+
+  <div id="kelasBox">
+    <label>Kelas (khusus LKPD)</label>
+    <input id="kelas" placeholder="Contoh: Kelas 4">
+  </div>
+
+  <label>Tema</label>
+  <input id="tema">
+
+  <label>Tujuan Pembelajaran</label>
+  <textarea id="tujuan"></textarea>
+
+  <label>Style Desain</label>
+  <select id="gaya">
+    <option>Edukatif Ceria</option>
+    <option>Paper Craft</option>
+    <option>Clay Motion</option>
+    <option>Watercolor</option>
+  </select>
+
+  <button class="primary" onclick="generate()">Generate Prompt</button>
+
+  <div id="limitBox" class="notice" style="display:none">
+    Credit trial Anda telah habis.<br>
+    Aktifkan Premium untuk penggunaan tanpa batas.
+    <a class="whatsapp"
+       href="https://wa.me/6289649805826?text=Halo%20Admin%20Teman%20Guru%2C%20saya%20ingin%20mengaktifkan%20akses%20Premium"
+       target="_blank">
+       Hubungi Admin via WhatsApp
+    </a>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Hasil Prompt</h3>
+  <textarea id="hasil" readonly></textarea>
+  <button class="copy" onclick="copyPrompt()">Copy Prompt</button>
+</div>
+
+<div class="card">
+  <h3>Aktivasi Premium</h3>
+  <input id="premiumCode" placeholder="Masukkan kode premium">
+  <button onclick="unlock()">Aktifkan Premium</button>
+</div>
+
+</div>
+
+<footer>
+  Tools ini dibuat oleh <b>Ihrish Studio</b> • © 2026
+</footer>
+
+<script>
+const ADMIN_WA = "6289649805826";
+const PREMIUM_KEY = "TG-PREMIUM-1234";
+
+let credit = parseInt(localStorage.getItem("tg_credit")) || 10;
+let premium = localStorage.getItem("tg_premium") === "true";
+
+const mapelData = {
+  PAUD:["Nilai Agama & Moral","Bahasa","Kognitif","Motorik"],
+  SD:["Bahasa Indonesia","Matematika","IPA","IPS","PPKn"],
+  SMP:["Bahasa Indonesia","Matematika","IPA","IPS"],
+  SMA:["Matematika","Biologi","Fisika","Kimia"]
+};
+
+function updateMapel(){
+  const m = document.getElementById("mapel");
+  m.innerHTML="";
+  mapelData[jenjang.value].forEach(x=>{
+    let o=document.createElement("option");
+    o.text=x;
+    m.add(o);
+  });
+}
+
+function toggleKelas(){
+  kelasBox.style.display = jenis.value==="LKPD"?"block":"none";
+}
+
+updateMapel(); toggleKelas();
+
+function generate(){
+  if(!premium){
+    if(credit<=0){
+      limitBox.style.display="block";
+      return;
+    }
+    credit--;
+    localStorage.setItem("tg_credit",credit);
+  }
+
+  hasil.value = `
+Prompt Media Pembelajaran
+
+Nama Guru: ${guru.value}
+Jenjang: ${jenjang.value}
+Mata Pelajaran: ${mapel.value}
+Jenis Media: ${jenis.value}
+Kelas: ${kelas.value||"-"}
+
+Tema:
+${tema.value}
+
+Tujuan Pembelajaran:
+${tujuan.value}
+
+Style Desain:
+${gaya.value}
+
+ATURAN VISUAL (WAJIB):
+- Semua makhluk hidup faceless (tanpa wajah)
+- Karakter perempuan wajib berjilbab
+- Aman nilai dan etika pendidikan
+`.trim();
+}
+
+function unlock(){
+  if(premiumCode.value===PREMIUM_KEY){
+    premium=true;
+    localStorage.setItem("tg_premium","true");
+    alert("Premium aktif. Terima kasih.");
+  }else{
+    alert("Kode premium salah");
+  }
+}
+
+function copyPrompt(){
+  hasil.select();
+  document.execCommand("copy");
+  alert("Prompt berhasil disalin");
+}
+</script>
+
+</body>
+</html>
