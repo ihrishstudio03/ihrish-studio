@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ihrish EduPrompt</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
+body{
+  background:linear-gradient(120deg,#e8f5e9,#f1f8e9);
+  color:#333;
+}
+header{
+  background:linear-gradient(135deg,#1b5e20,#43a047);
+  color:#fff;
+  text-align:center;
+  padding:32px 20px;
+  border-bottom-left-radius:30px;
+  border-bottom-right-radius:30px;
+}
+header h1{font-size:2rem;margin-bottom:6px}
+header p{font-size:.95rem;opacity:.9}
+
+.container{
+  max-width:920px;
+  margin:-30px auto 30px;
+  padding:16px;
+}
+
+.card{
+  background:#fff;
+  border-radius:20px;
+  padding:24px;
+  margin-bottom:22px;
+  box-shadow:0 12px 30px rgba(0,0,0,.08);
+}
+
+.form-group{margin-bottom:14px}
+label{font-weight:600;font-size:.85rem;display:block;margin-bottom:6px}
+input,select,textarea{
+  width:100%;
+  padding:11px 12px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:.9rem;
+}
+textarea{min-height:95px}
+input:disabled{background:#f3f3f3}
+
+button{
+  width:100%;
+  padding:14px;
+  border-radius:14px;
+  border:none;
+  background:linear-gradient(135deg,#2e7d32,#66bb6a);
+  color:#fff;
+  font-size:.95rem;
+  font-weight:600;
+  cursor:pointer;
+}
+button:hover{opacity:.9}
+
+.output textarea{min-height:220px}
+.copy{
+  margin-top:12px;
+  background:linear-gradient(135deg,#388e3c,#81c784)
+}
+
+footer{
+  text-align:center;
+  font-size:.75rem;
+  color:#555;
+  padding:16px;
+}
+.badge{
+  display:inline-block;
+  padding:6px 10px;
+  font-size:.7rem;
+  border-radius:10px;
+  background:#e8f5e9;
+  color:#2e7d32;
+  margin-bottom:10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Ihrish EduPrompt</h1>
+  <p>Tools Prompt Media Pembelajaran Guru • Aman • Kurikulum Terkini</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+<span class="badge">Pengaturan Media</span>
+
+<div class="form-group">
+<label>Nama Guru</label>
+<input id="guru" placeholder="Contoh: Ibu Siti, S.Pd" required>
+</div>
+
+<div class="form-group">
+<label>Jenjang Pendidikan</label>
+<select id="jenjang" onchange="updateMapel()">
+  <option value="">Pilih Jenjang</option>
+  <option>PAUD</option>
+  <option>SD</option>
+  <option>SMP</option>
+  <option>SMA/SMK</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>Mata Pelajaran</label>
+<select id="mapel">
+  <option>Pilih jenjang terlebih dahulu</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>Jenis Media</label>
+<select id="jenis" onchange="toggleLKPD()">
+  <option>LKPD</option>
+  <option>Infografis</option>
+  <option>Poster Edukasi</option>
+</select>
+</div>
+
+<div class="form-group" id="kelasBox">
+<label>Keterangan Kelas (khusus LKPD)</label>
+<input id="kelas" placeholder="Contoh: Kelas 4 Semester 1">
+</div>
+
+<div class="form-group">
+<label>Tema / Topik</label>
+<input id="tema" placeholder="Contoh: Deforestasi dan Sawit" required>
+</div>
+
+<div class="form-group">
+<label>Tujuan Pembelajaran</label>
+<textarea id="tujuan" placeholder="Siswa mampu memahami..." required></textarea>
+</div>
+
+<div class="form-group">
+<label>Style Desain</label>
+<select id="gaya">
+  <option>Edukatif Ceria</option>
+  <option>Disney-like (family friendly)</option>
+  <option>Clay Motion</option>
+  <option>Paper Craft</option>
+  <option>Watercolor Edukasi</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>Aturan Visual (WAJIB)</label>
+<input disabled value="Makhluk hidup FACELESS & karakter perempuan BERJILBAB">
+</div>
+
+<div class="form-group">
+<label>Ukuran Media</label>
+<select id="ukuran">
+  <option>A4 Portrait</option>
+  <option>A3 Poster</option>
+  <option>Instagram 1080x1080</option>
+  <option>Slide Presentasi 16:9</option>
+</select>
+</div>
+
+<button onclick="buatPrompt()">Generate Prompt</button>
+</div>
+
+<div class="card output" id="hasilBox">
+<span class="badge">Prompt Siap Pakai</span>
+<textarea id="hasil" readonly></textarea>
+<button class="copy" onclick="salin()">Salin Prompt</button>
+</div>
+
+</div>
+
+<footer>
+© 2026 Ihrish EduPrompt • Edukatif • Beretika • Siap Kurikulum
+</footer>
+
+<script>
+function updateMapel(){
+const jenjang = document.getElementById("jenjang").value;
+const mapel = document.getElementById("mapel");
+mapel.innerHTML = "";
+
+let data = {
+"PAUD":["Nilai Agama & Moral","Bahasa","Kognitif","Seni","Motorik"],
+"SD":["Bahasa Indonesia","Matematika","IPAS","Pendidikan Pancasila","SBdP","PJOK"],
+"SMP":["Bahasa Indonesia","Matematika","IPA","IPS","Pendidikan Pancasila","Bahasa Inggris"],
+"SMA/SMK":["Bahasa Indonesia","Matematika","Biologi","Fisika","Kimia","Sejarah","Ekonomi"]
+};
+
+(data[jenjang]||[]).forEach(m=>{
+  let opt=document.createElement("option");
+  opt.textContent=m;
+  mapel.appendChild(opt);
+});
+}
+
+function toggleLKPD(){
+const jenis=document.getElementById("jenis").value;
+document.getElementById("kelasBox").style.display=
+(jenis==="LKPD")?"block":"none";
+}
+
+toggleLKPD();
+
+function buatPrompt(){
+const guru=guruEl=guru.value.trim();
+const jenjang=document.getElementById("jenjang").value;
+const mapel=document.getElementById("mapel").value;
+const jenis=document.getElementById("jenis").value;
+const kelas=document.getElementById("kelas").value;
+const tema=document.getElementById("tema").value;
+const tujuan=document.getElementById("tujuan").value;
+const gaya=document.getElementById("gaya").value;
+const ukuran=document.getElementById("ukuran").value;
+
+if(!guru||!jenjang||!mapel||!tema||!tujuan){
+alert("Mohon lengkapi data wajib");
+return;
+}
+
+let gayaVisual=gaya;
+if(gaya==="Paper Craft"){
+gayaVisual=`Vertical educational infographic poster about ${tema},
+3D layered paper cut-out art style,
+craft paper texture,
+soft volumetric lighting,
+high depth of field,
+top section: large playful bubble text title.`;
+}
+
+let prompt=`
+Buat desain ${jenis} pembelajaran ${mapel}
+Jenjang: ${jenjang}
+${jenis==="LKPD"?"Kelas: "+kelas:""}
+
+Tema:
+"${tema}"
+
+Tujuan Pembelajaran:
+${tujuan}
+
+Gaya Visual:
+${gayaVisual}
+
+ATURAN WAJIB:
+- Semua makhluk hidup TANPA WAJAH (faceless)
+- Karakter perempuan WAJIB memakai jilbab
+- Aman dan ramah pendidikan
+
+Ukuran Media:
+${ukuran}
+
+Penyusun:
+${guru}
+`;
+
+hasil.value=prompt.trim();
+hasilBox.scrollIntoView({behavior:"smooth"});
+}
+
+function salin(){
+navigator.clipboard.writeText(hasil.value)
+.then(()=>alert("Prompt berhasil disalin"));
+}
+</script>
+
+</body>
+</html>
