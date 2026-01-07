@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teman Guru</title>
+
+<style>
+*{box-sizing:border-box;font-family:Inter,Segoe UI,Arial}
+body{margin:0;background:linear-gradient(180deg,#eef4ff,#ffffff);color:#1f2937}
+header{
+  background:linear-gradient(135deg,#1e88e5,#1565c0);
+  padding:30px 16px;color:#fff;text-align:center
+}
+header h1{margin:0;font-size:2.2rem;font-weight:900}
+header p{margin-top:8px;font-size:.95rem;opacity:.95}
+
+.container{max-width:900px;margin:28px auto;padding:16px}
+.card{
+  background:#fff;border-radius:22px;padding:26px;
+  box-shadow:0 15px 40px rgba(0,0,0,.08);margin-bottom:24px
+}
+.topbar{display:flex;justify-content:space-between;margin-bottom:16px}
+.badge{padding:8px 16px;border-radius:999px;font-size:.75rem;font-weight:800}
+.trial{background:#fef3c7;color:#92400e}
+.premium{background:#dcfce7;color:#166534}
+
+label{font-weight:700;font-size:.85rem}
+input,select,textarea{
+  width:100%;padding:13px;margin:6px 0 14px;
+  border-radius:14px;border:1px solid #d1d5db;font-size:.9rem
+}
+textarea{min-height:120px}
+
+button{width:100%;padding:15px;border:none;border-radius:16px;font-weight:800;cursor:pointer}
+.primary{background:linear-gradient(135deg,#1e88e5,#1565c0);color:#fff}
+.copy{background:#22c55e;color:#fff;margin-top:10px}
+
+.notice{
+  margin-top:16px;background:#fff7ed;border-left:4px solid #f97316;
+  padding:16px;border-radius:14px;font-size:.85rem
+}
+.whatsapp{
+  display:block;margin-top:12px;padding:14px;text-align:center;
+  background:#25d366;color:#fff;font-weight:900;
+  border-radius:16px;text-decoration:none
+}
+
+footer{text-align:center;padding:22px;font-size:.8rem;color:#6b7280}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Teman Guru</h1>
+<p>AI Image Prompt Generator for Education</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+<div class="topbar">
+<span id="statusBadge" class="badge trial">TRIAL</span>
+<span id="creditText" class="badge trial">Credits: 10</span>
+</div>
+
+<label>Nama Guru</label>
+<input id="guru" placeholder="Contoh: Ibu Siti">
+
+<label>Jenjang Pendidikan</label>
+<select id="jenjang">
+<option>PAUD</option>
+<option>SD</option>
+<option>SMP</option>
+<option>SMA</option>
+<option>SMK</option>
+</select>
+
+<label>Mata Pelajaran</label>
+<input id="mapel" placeholder="Contoh: Ilmu Pengetahuan Alam">
+
+<label>Jenis Media</label>
+<select id="jenis">
+<option>LKPD</option>
+<option>Infografis</option>
+<option>Poster Edukasi</option>
+</select>
+
+<div id="kelasBox">
+<label>Keterangan Kelas (khusus LKPD)</label>
+<input id="kelas" placeholder="Contoh: Kelas 4 Semester 1">
+</div>
+
+<label>Tema / Materi</label>
+<input id="tema" placeholder="Contoh: Daur Air">
+
+<label>Tujuan Pembelajaran</label>
+<textarea id="tujuan" placeholder="Contoh: Siswa memahami proses siklus air"></textarea>
+
+<label>Style Desain</label>
+<select id="gaya">
+<option>Edukatif Ceria</option>
+<option>Paper Craft</option>
+<option>Clay Motion</option>
+<option>Watercolor</option>
+</select>
+
+<button class="primary" onclick="generatePrompt()">Generate AI Image Prompt</button>
+
+<div id="limitBox" class="notice" style="display:none">
+Trial credits exhausted.
+<a class="whatsapp"
+href="https://wa.me/6289649805826?text=Hello%20Admin%20Teman%20Guru,%20I%20want%20to%20upgrade%20to%20Premium"
+target="_blank">
+Upgrade to Premium via WhatsApp
+</a>
+</div>
+</div>
+
+<div class="card">
+<h3>AI-Ready Image Prompt (English)</h3>
+<textarea id="hasil" readonly></textarea>
+<button class="copy" onclick="copyPrompt()">Copy Prompt</button>
+</div>
+
+</div>
+
+<footer>
+© 2026 • Built professionally by <b>Ihrish Studio</b>
+</footer>
+
+<script>
+let credit=parseInt(localStorage.getItem("tg_credit"))||10;
+let premium=localStorage.getItem("tg_premium")==="true";
+
+creditText.textContent="Credits: "+credit;
+if(premium){
+  statusBadge.textContent="PREMIUM";
+  statusBadge.className="badge premium";
+}
+
+jenis.onchange=()=>kelasBox.style.display=jenis.value==="LKPD"?"block":"none";
+jenis.onchange();
+
+function generatePrompt(){
+if(!premium){
+  if(credit<=0){limitBox.style.display="block";return;}
+  credit--;localStorage.setItem("tg_credit",credit);
+  creditText.textContent="Credits: "+credit;
+}
+
+let prompt=`
+Educational illustration for ${jenjang.value} students,
+subject: ${mapel.value},
+topic: ${tema.value},
+learning objective: ${tujuan.value},
+
+visual style: ${gaya.value},
+clean professional educational layout,
+clear information hierarchy,
+high resolution, studio lighting,
+soft color palette, sharp focus,
+
+STRICT RULES:
+no facial features on any living beings,
+all female characters wearing hijab,
+school-safe, culturally respectful.
+`;
+
+if(gaya.value==="Paper Craft"){
+prompt=`
+Vertical educational infographic poster about ${tema.value},
+3D layered paper cut-out art style,
+craft paper texture,
+soft volumetric lighting,
+high depth of field,
+top section with large playful bubble title,
+handcrafted paper layers, soft shadows,
+high resolution, professional educational artwork,
+
+STRICT RULES:
+faceless characters only,
+female characters wearing hijab,
+safe for school use.
+`;
+}
+
+hasil.value=prompt.trim();
+}
+
+function copyPrompt(){
+hasil.select();
+document.execCommand("copy");
+alert("Prompt berhasil disalin");
+}
+</script>
+
+</body>
+</html>
