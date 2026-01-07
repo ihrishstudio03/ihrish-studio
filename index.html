@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teman Guru</title>
+
+<style>
+*{box-sizing:border-box;font-family:Inter,Segoe UI,Arial}
+body{margin:0;background:linear-gradient(180deg,#eef4ff,#ffffff);color:#1f2937}
+header{
+  background:linear-gradient(135deg,#1e88e5,#1565c0);
+  padding:32px 16px;color:#fff;text-align:center
+}
+header h1{margin:0;font-size:2.3rem;font-weight:900}
+header p{margin-top:6px;font-size:.95rem;opacity:.95}
+
+.container{max-width:940px;margin:30px auto;padding:16px}
+.card{
+  background:#fff;border-radius:24px;padding:28px;
+  box-shadow:0 18px 45px rgba(0,0,0,.08);margin-bottom:26px
+}
+.topbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.badge{
+  padding:8px 16px;border-radius:999px;
+  font-size:.75rem;font-weight:800
+}
+.trial{background:#fef3c7;color:#92400e}
+.premium{background:#dcfce7;color:#166534}
+.code{background:#e0f2fe;color:#075985}
+
+label{font-weight:700;font-size:.85rem}
+input,select,textarea{
+  width:100%;padding:14px;margin:6px 0 14px;
+  border-radius:16px;border:1px solid #d1d5db;font-size:.9rem
+}
+textarea{min-height:120px}
+
+button{
+  width:100%;padding:16px;border:none;
+  border-radius:18px;font-weight:800;cursor:pointer
+}
+.primary{background:linear-gradient(135deg,#1e88e5,#1565c0);color:#fff}
+.copy{background:#22c55e;color:#fff;margin-top:10px}
+
+.notice{
+  margin-top:18px;background:#fff7ed;border-left:5px solid #f97316;
+  padding:18px;border-radius:16px;font-size:.85rem
+}
+.whatsapp{
+  display:block;margin-top:14px;padding:15px;text-align:center;
+  background:#25d366;color:#fff;font-weight:900;
+  border-radius:18px;text-decoration:none
+}
+
+footer{text-align:center;padding:24px;font-size:.8rem;color:#6b7280}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Teman Guru</h1>
+<p>Generator Prompt AI untuk Media Pembelajaran</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+<div class="topbar">
+<span id="statusBadge" class="badge trial">TRIAL</span>
+<span id="creditText" class="badge trial"></span>
+<span id="codeText" class="badge code"></span>
+</div>
+
+<label>Nama Guru</label>
+<input id="guru" placeholder="Contoh: Ibu Siti, S.Pd">
+
+<label>Jenjang Pendidikan</label>
+<select id="jenjang">
+<option>PAUD</option>
+<option>SD</option>
+<option>SMP</option>
+<option>SMA / SMK</option>
+</select>
+
+<label>Mata Pelajaran</label>
+<input id="mapel" placeholder="Contoh: Ilmu Pengetahuan Alam">
+
+<label>Jenis Media</label>
+<select id="jenis">
+<option>LKPD</option>
+<option>Infografis</option>
+<option>Poster Edukasi</option>
+</select>
+
+<div id="kelasBox">
+<label>Keterangan Kelas (khusus LKPD)</label>
+<input id="kelas" placeholder="Contoh: Kelas 4 Semester 1">
+</div>
+
+<label>Tema / Materi</label>
+<input id="tema" placeholder="Contoh: Daur Air">
+
+<label>Tujuan Pembelajaran</label>
+<textarea id="tujuan" placeholder="Contoh: Peserta didik memahami proses daur air"></textarea>
+
+<label>Gaya Desain</label>
+<select id="gaya">
+<option>Edukatif Bersih</option>
+<option>Paper Craft</option>
+<option>Clay Motion</option>
+<option>Watercolor</option>
+</select>
+
+<button class="primary" onclick="generatePrompt()">Buat Prompt Gambar AI</button>
+
+<div id="limitBox" class="notice" style="display:none">
+Kuota trial Anda telah habis.<br>
+Silakan hubungi admin untuk mengaktifkan versi premium.
+
+<a id="waLink" class="whatsapp" target="_blank">
+Hubungi Admin via WhatsApp
+</a>
+
+<hr style="margin:14px 0">
+
+<b>Punya Kode Premium?</b>
+<input id="premiumInput" placeholder="Masukkan kode premium">
+<button onclick="activatePremium()">Aktifkan Premium</button>
+</div>
+</div>
+
+<div class="card">
+<h3>Prompt Siap Digunakan (Bahasa Inggris – Optimal untuk AI)</h3>
+<textarea id="hasil" readonly></textarea>
+<button class="copy" onclick="copyPrompt()">Salin Prompt</button>
+</div>
+
+</div>
+
+<footer>
+© 2026 • Dibuat secara profesional oleh <b>Ihrish Studio</b>
+</footer>
+
+<script>
+// ====== USER CODE (tetap sama walau hapus cache) ======
+let storedCode = localStorage.getItem("tg_user_code");
+if(!storedCode){
+    let restoreCode = prompt("Masukkan Kode Pengguna lama (jika ada) atau OK untuk generate baru:");
+    if(restoreCode){
+        storedCode = restoreCode;
+    } else {
+        storedCode = "TG-"+Math.random().toString(16).substr(2,8).toUpperCase();
+    }
+    localStorage.setItem("tg_user_code", storedCode);
+}
+let userCode = storedCode;
+codeText.textContent="Kode Pengguna: "+userCode;
+
+// ====== KREDIT & PREMIUM ======
+let creditKey = "tg_credit_"+userCode;
+let premiumKey = "tg_premium_"+userCode;
+
+// Hanya buat kredit pertama kali
+if(localStorage.getItem(creditKey)===null){
+  localStorage.setItem(creditKey, 10);
+}
+let credit = parseInt(localStorage.getItem(creditKey));
+let premium = localStorage.getItem(premiumKey)==="true";
+
+function refreshStatus(){
+  if(premium){
+    statusBadge.textContent="PREMIUM";
+    statusBadge.className="badge premium";
+    creditText.textContent="Tanpa Batas";
+  }else{
+    creditText.textContent="Sisa Kredit: "+credit;
+  }
+}
+refreshStatus();
+
+// ====== UI ======
+jenis.onchange=()=>kelasBox.style.display=(jenis.value==="LKPD")?"block":"none";
+jenis.onchange();
+
+// ====== KODE PREMIUM (ADMIN) ======
+const PREMIUM_CODES=[
+  "TG-PRO-8XK92Q",
+  "TG-PRO-A91KLM",
+  "TG-PRO-QA77XZ"
+];
+
+// ====== GENERATE PROMPT ======
+function generatePrompt(){
+if(!premium){
+  if(credit<=0){
+    limitBox.style.display="block";
+    waLink.href=`https://wa.me/6289649805826?text=Halo%20Admin%20Teman%20Guru,%20saya%20ingin%20upgrade%20Premium.%20Kode%20Pengguna%20saya:%20${userCode}`;
+    return;
+  }
+  credit--;
+  localStorage.setItem(creditKey,credit);
+  refreshStatus();
+}
+
+let prompt=`
+Educational illustration for ${jenjang.value} students,
+subject: ${mapel.value},
+topic: ${tema.value},
+learning objective: ${tujuan.value},
+
+clean professional educational style,
+clear information hierarchy,
+soft lighting, high resolution,
+school-friendly illustration,
+
+STRICT RULES:
+no facial features on any living beings,
+all female characters wearing hijab.
+`;
+
+if(gaya.value==="Paper Craft"){
+prompt=`
+Vertical educational infographic poster about ${tema.value},
+3D layered paper cut-out art style,
+craft paper texture,
+soft volumetric lighting,
+high depth of field,
+large playful bubble title at top,
+handcrafted layered paper effect,
+high resolution professional artwork,
+
+STRICT RULES:
+faceless characters only,
+female characters wearing hijab.
+`;
+}
+
+hasil.value=prompt.trim();
+}
+
+// ====== AKTIVASI PREMIUM ======
+function activatePremium(){
+let code=document.getElementById("premiumInput").value.trim();
+if(!PREMIUM_CODES.includes(code)){
+  alert("Kode premium tidak valid");
+  return;
+}
+localStorage.setItem(premiumKey,"true");
+alert("Premium berhasil diaktifkan!");
+location.reload();
+}
+
+// ====== SALIN PROMPT ======
+function copyPrompt(){
+hasil.select();
+document.execCommand("copy");
+alert("Prompt berhasil disalin");
+}
+</script>
+
+</body>
+</html>
